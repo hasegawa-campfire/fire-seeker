@@ -1,0 +1,124 @@
+<script type="module">
+  import { setupEl } from '@/lib/el/index.js'
+  import { store, maxVolume } from '@/r.js'
+  import { setAudioVolume } from '@/lib/audio.js'
+  import './x-text.m.html'
+  import './x-button.m.html'
+  import './x-icon.m.html'
+
+  export class XHeader extends HTMLElement {
+    static {
+      customElements.define('x-header', this)
+    }
+
+    onBackClick = null
+    onHelpClick = null
+    volume = false
+
+    constructor() {
+      super()
+      setupEl(this, import.meta.document)
+    }
+
+    isMute() {
+      return store.isMute
+    }
+
+    toggleMute() {
+      store.isMute = !store.isMute
+      setAudioVolume(store.isMute ? 0 : maxVolume)
+    }
+  }
+</script>
+
+<template>
+  <template :if="onBackClick">
+    <x-button class="col button" :onclick="() => onBackClick()">
+      <x-icon class="icon-back"></x-icon>
+    </x-button>
+  </template>
+
+  <div class="col auto">
+    <x-text class="title">
+      <slot></slot>
+    </x-text>
+  </div>
+
+  <template :if="volume">
+    <x-button class="col button" :onclick="() => toggleMute()">
+      <x-icon class="icon-mute" :data-active="isMute()"></x-icon>
+    </x-button>
+  </template>
+
+  <template :if="onHelpClick">
+    <x-button class="col button" :onclick="() => onHelpClick()">
+      <x-icon class="icon-help"></x-icon>
+    </x-button>
+  </template>
+</template>
+
+<style>
+  :host {
+    display: flex;
+    padding: 0px 10px;
+
+    @media (width < 460px) {
+      padding: 0;
+    }
+  }
+
+  .col {
+    height: 60px;
+
+    &.auto {
+      flex: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &.button {
+      flex: none;
+      width: 60px;
+      z-index: 1;
+    }
+  }
+
+  .title {
+    font-size: calc(4cqw + 6px);
+    color: #fff;
+    filter: drop-shadow(0 0 2px #0004) drop-shadow(4px 4px 2px #0001);
+  }
+
+  .icon {
+    font-size: 40px;
+    --start-color: var(--color0-start-color);
+    --end-color: var(--color0-end-color);
+  }
+
+  x-icon {
+    width: 48px;
+    --start-color: var(--color0-start-color);
+    --end-color: var(--color0-end-color);
+
+    &.icon-back {
+      --icon-mask: url(assets/back.svg);
+    }
+
+    &.icon-help {
+      --icon-mask: url(assets/help.svg);
+    }
+
+    &.icon-mute {
+      width: 48px;
+    }
+
+    &.icon-mute:not([data-active]) {
+      --icon-mask: url(assets/audio-on.svg);
+    }
+
+    &.icon-mute[data-active] {
+      --icon-mask: url(assets/audio-off.svg);
+    }
+  }
+</style>

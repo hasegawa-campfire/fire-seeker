@@ -1,0 +1,88 @@
+<script type="module">
+  import { setupEl } from '@/lib/el/index.js'
+  import './x-dialog.m.html'
+
+  export class HelpTitle extends HTMLElement {
+    static {
+      customElements.define('help-title', this)
+    }
+
+    constructor() {
+      super()
+      setupEl(this, import.meta.document)
+    }
+
+    open = (wait) => {
+      this.shadowRoot.querySelector('x-dialog').open(wait)
+    }
+  }
+</script>
+
+<template>
+  <x-dialog>
+    <h4>このゲームは？</h4>
+
+    CAMPFIREのアドベントカレンダー<br />で作られたミニゲームです<br />
+    <a href="https://qiita.com/advent-calendar/2024/campfire" target="_blank">Advent Calendar 2024</a><br />
+
+    <h4>クレジット</h4>
+
+    <div class="credit">
+      <div>制作：</div>
+      <div><a href="https://x.com/hsgwkt" target="_blank">8kg</a></div>
+      <div>音楽： </div>
+      <div><a href="https://dova-s.jp" target="_blank">DOVA-SYNDROME</a></div>
+      <div>効果音： </div>
+      <div><a href="https://soundeffect-lab.info" target="_blank">効果音ラボ</a></div>
+      <div>フォント： </div>
+      <div><a href="https://fonts.google.com/specimen/M+PLUS+Rounded+1c" target="_blank">M PLUS Rounded 1c</a></div>
+      <div>アイコン： </div>
+      <div><a href="https://tabler.io/icons" target="_blank">Tabler Icons</a></div>
+    </div>
+  </x-dialog>
+</template>
+
+<style>
+  :host {
+    display: contents;
+    font-weight: 400;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  h4 {
+    font-weight: 900;
+    margin: 2em 0 1em;
+    font-size: 140%;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    &:first-of-type {
+      margin-top: 0;
+    }
+
+    &::before,
+    &::after {
+      content: '';
+      flex: auto;
+      height: 2px;
+      border-top: #ccc 1px solid;
+      border-bottom: #ccc 1px solid;
+    }
+  }
+
+  a {
+    color: var(--color0-start-color);
+  }
+
+  .credit {
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-items: start;
+
+    &>div:nth-child(odd) {
+      justify-self: end;
+    }
+  }
+</style>

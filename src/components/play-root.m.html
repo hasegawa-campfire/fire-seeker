@@ -1,0 +1,357 @@
+<script type="module">
+  import { setupEl } from '@/lib/el/index.js'
+  import { store, state, se, bgm } from '@/r.js'
+  import './x-bg.m.html'
+  import './x-header.m.html'
+  import './x-button.m.html'
+  import './help-simple.m.html'
+  import './help-heartful.m.html'
+  import './help-colorful.m.html'
+  import './help-shuffle.m.html'
+  import './play-piece.m.html'
+  import { counting, areas, rules } from '@/rule/index.js'
+
+  function toVector(pos1, pos2) {
+    const x = pos1.x - pos2.x
+    const y = pos1.y - pos2.y
+    const len = Math.sqrt(x ** 2 + y ** 2)
+    return { x: x / len, y: y / len }
+  }
+
+  export class PlayRoot extends HTMLElement {
+    static {
+      customElements.define('play-root', this)
+    }
+
+    bgStyle = {}
+    titleName = ''
+    ruleKey = ''
+    area = {}
+    cells = []
+    rests = []
+    counting = counting
+    selectedRest = null
+    selectedCell = null
+    targetMoves = 0
+    currentMoves = 0
+    isEnding = false
+    isEnded = false
+    isPerfect = false
+
+    constructor() {
+      super()
+      setupEl(this, import.meta.document)
+
+      const { areaKey, ruleKey, level } = state
+
+      const area = areas[areaKey]
+      const rule = rules[ruleKey]
+      const ruleMeta = rule.meta[areaKey][level]
+      const { answer, cells, rests } = rule.gen({ area, areaKey, level })
+
+      this.ruleKey = ruleKey
+      this.area = area
+      this.style.setProperty('--area-w', area.w)
+      this.cells = cells
+      this.rests = rests
+      this.targetMoves = ruleMeta.moves
+      this.titleName = ruleMeta.name ?? `${rule.name}${level + 1}`
+      this.bgStyle = {
+        background: ruleMeta.bg ?? area.bg,
+        '--light': ruleMeta.light ?? area.light,
+        '--waves-opacity': ruleMeta.wavesOpacity ?? area.wavesOpacity,
+      }
+
+      const answerStr = answer.map(({ heart, color }) => (heart ? color : '_')).join('')
+      const answerLines = Array.from({ length: area.w }).map((_, i) => {
+        return answerStr.slice(i * area.w, (i + 1) * area.w)
+      })
+      console.debug(answerLines.join('\n'))
+
+      if (!store.help[ruleKey]) {
+        store.help[ruleKey] = true
+        requestAnimationFrame(() => this.openHelp(1000))
+      }
+
+      bgm.play.play(1)
+    }
+
+    goBack() {
+      history.back()
+    }
+
+    isHighlight(index) {
+      const cell = this.cells[index]
+      if (!cell.selectable || cell.checked) return false
+      if (this.selectedCell !== null) {
+        const sel = this.cells[this.selectedCell]
+        if (
+          cell.color === sel.color &&
+          cell.number === sel.number &&
+          cell.heart === sel.heart &&
+          cell.count === sel.count
+        ) return false
+        return true
+      }
+      if (this.selectedRest !== null) {
+        if (cell.heart || cell.number) return false
+        return true
+      }
+      return false
+    }
+
+    onCellClick(index) {
+      const cell = this.cells[index]
+      const cellPos = this.getElementPos(`.cells x-button[data-index="${index}"]`)
+      if (!cell.selectable) return
+
+      if (this.selectedRest !== null) {
+        if (cell.checked) return
+
+        if (cell.heart || cell.number) {
+          this.selectedCell = index
+          this.selectedRest = null
+          se.click.play()
+          return
+        }
+
+        const selPos = this.getElementPos(`.rests x-button[data-index="${this.selectedRest}"]`)
+        const sel = this.rests[this.selectedRest]
+        this.rests[this.selectedRest] = cell
+        this.cells[index] = sel
+        this.selectedRest = null
+        this.currentMoves++
+        this.check()
+        sel.vector = toVector(selPos, cellPos)
+        se.move.play()
+        return
+      }
+
+      if (this.selectedCell !== null) {
+        if (cell.checked) return
+
+        const sel = this.cells[this.selectedCell]
+        const selPos = this.getElementPos(`.cells x-button[data-index="${this.selectedCell}"]`)
+
+        if (this.selectedCell === index) {
+          this.selectedCell = null
+          se.click.play()
+          return
+        }
+
+        if (
+          cell.color === sel.color &&
+          cell.number === sel.number &&
+          cell.heart === sel.heart &&
+          cell.count === sel.count
+        ) {
+          this.selectedCell = index
+          se.click.play()
+          return
+        }
+
+        this.cells[this.selectedCell] = cell
+        this.cells[index] = sel
+        this.selectedCell = null
+        this.currentMoves++
+        this.check()
+        sel.vector = toVector(selPos, cellPos)
+        cell.vector = toVector(cellPos, selPos)
+        se.move.play()
+        return
+      }
+
+      if (!cell.number && !cell.heart) {
+        cell.checked = !cell.checked
+        se.click.play()
+        return
+      }
+
+      this.selectedCell = index
+      this.selectedRest = null
+      se.click.play()
+    }
+
+    onRestClick(index) {
+      const cell = this.rests[index]
+      if (!cell.number && !cell.heart) return
+
+      if (index === this.selectedRest) {
+        this.selectedRest = null
+        se.click.play()
+        return
+      }
+
+      this.selectedCell = null
+      this.selectedRest = index
+      se.click.play()
+    }
+
+    check() {
+      if (this.rests.some((r) => r.heart || r.number)) return
+
+      for (let i = 0; i < this.cells.length; i++) {
+        const cell = this.cells[i]
+        if (!cell.number) continue
+        if (cell.count !== counting(this.area, this.cells, i)) return
+      }
+
+      const { areaKey, ruleKey, level } = state
+      const key = `${areaKey}_${ruleKey}_${level}`
+
+      if (!store.moves[key] || store.moves[key] > this.currentMoves) {
+        store.moves[key] = this.currentMoves
+      }
+
+      requestAnimationFrame(() => {
+        this.isEnding = true
+        this.isPerfect = this.currentMoves <= this.targetMoves
+        setTimeout(() => this.isEnded = true, 2300)
+        se.clear1.play()
+        if (this.isPerfect) se.clear2.play(1.5)
+        bgm.play.setVolume(0, 2.5)
+        bgm.play.stop(2.5)
+      })
+    }
+
+    getElementPos = (query) => {
+      const rect = this.shadowRoot.querySelector(query).getBoundingClientRect()
+      return { x: (rect.left + rect.right) / 2, y: (rect.top + rect.bottom) / 2 }
+    }
+
+    openHelp = (wait) => {
+      this.shadowRoot.querySelector('.help').open(wait)
+    }
+
+    onOverlayClick() {
+      se.click.play()
+      this.goBack()
+    }
+  }
+</script>
+
+<template>
+  <template :if="ruleKey === 'simple'">
+    <help-simple class="help"></help-simple>
+  </template>
+  <template :if="ruleKey === 'heartful'">
+    <help-heartful class="help"></help-heartful>
+  </template>
+  <template :if="ruleKey === 'colorful'">
+    <help-colorful class="help"></help-colorful>
+  </template>
+  <template :if="ruleKey === 'shuffle'">
+    <help-shuffle class="help"></help-shuffle>
+  </template>
+
+  <x-bg :show-snow="isPerfect" :style="bgStyle">
+    <x-header :on-back-click="() => goBack()" :on-help-click="() => openHelp()">
+      ${titleName} (${Math.min(currentMoves, 99)}/${targetMoves})
+    </x-header>
+
+    <div class="board cells" :inert="isEnding">
+      <template :each="cells">
+        <x-button :bg="!!item.selectable" :select="selectedCell === index" :checked="!!item.checked"
+          :highlight="isHighlight(index)" no-se :onpointerdown="(e) => {!e.button && onCellClick(index)}"
+          :inert="!item.selectable" :data-color="item.color" :data-index="index">
+          <template :if="item.heart || item.number">
+            <play-piece :item="item" :ok="!item.number || item.count === counting(area, cells, index)"></play-piece>
+          </template>
+        </x-button>
+      </template>
+    </div>
+  </x-bg>
+
+  <div class="board rests" :inert="isEnding">
+    <template :each="rests">
+      <x-button no-se :onpointerdown="(e) => {!e.button && onRestClick(index)}" :select="selectedRest === index"
+        :inert="!(item.heart || item.number)" :data-color="item.color" :data-index="index">
+        <template :if="item.heart || item.number">
+          <play-piece :item="item"></play-piece>
+        </template>
+      </x-button>
+    </template>
+  </div>
+
+  <template :if="isEnding">
+    <div class="overlay" :onclick="() => isEnded && onOverlayClick()" :data-clickable="isEnded"
+      :style="{ '--light': bgStyle.light }"></div>
+  </template>
+</template>
+
+<style>
+  :host {
+    position: relative;
+    display: block;
+  }
+
+  x-bg {
+    --snow-delay: 1s;
+  }
+
+  .board {
+    padding: 5cqw 15cqw 10cqw;
+    display: grid;
+    grid-template-columns: repeat(var(--area-w), 1fr);
+    gap: 10px;
+
+    @media (width < 460px) {
+      padding: 32px 16px;
+    }
+
+    &.rests {
+      padding-top: 0;
+    }
+  }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background-color: #fff8;
+    opacity: 0;
+    mix-blend-mode: plus-lighter;
+    /* will-change: opacity; */
+    animation: flash 2s ease-out;
+
+    &:not([data-clickable]) {
+      pointer-events: none;
+      z-index: 9;
+    }
+
+    &[data-clickable] {
+      cursor: pointer;
+    }
+  }
+
+  @keyframes flash {
+    from {
+      opacity: var(--light, 0.5);
+    }
+
+    to {
+      opacity: 0;
+    }
+  }
+
+  [data-color='0'] {
+    --start-color: var(--color0-start-color);
+    --end-color: var(--color0-end-color);
+  }
+
+  [data-color='1'] {
+    --start-color: var(--color1-start-color);
+    --end-color: var(--color1-end-color);
+  }
+
+  [data-color='2'] {
+    --start-color: var(--color2-start-color);
+    --end-color: var(--color2-end-color);
+  }
+
+  x-button {
+    --cell-stroke: 18%;
+    --select-inset: 6%;
+    --select-stroke: 6%;
+    aspect-ratio: 1;
+  }
+</style>

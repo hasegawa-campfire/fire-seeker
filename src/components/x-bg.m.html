@@ -1,0 +1,205 @@
+<script type="module">
+  import { setupEl } from '@/lib/el/index.js'
+
+  function shuffle(items) {
+    return items
+      .map((v) => [Math.random(), v])
+      .sort(([a], [b]) => a - b)
+      .map(([, v]) => v)
+  }
+
+  function times(length, fn) {
+    return Array.from({ length }).map((_, i) => fn(i))
+  }
+
+  export class XBg extends HTMLElement {
+    static {
+      customElements.define('x-bg', this)
+    }
+
+    bg = '#fff'
+    showSnow = false
+    snows = []
+
+    constructor() {
+      super()
+      setupEl(this, import.meta.document)
+
+      const len = 20
+      const xs = shuffle(times(len, (i) => (i + 1) / (len + 1)))
+      const dxs = shuffle(times(len, (i) => i / (len - 1) - 0.5))
+      const ys = shuffle(times(len, (i) => i / len))
+      const ss = shuffle(times(len, (i) => (i / len) * 0.5 + 0.5))
+      this.snows = times(len, (i) => ({
+        left: `${xs[i] * 100}%`,
+        '--delay': `${(8 / ss[i] ** 2) * -ys[i]}s`,
+        '--duration': `${8 / ss[i] ** 2}s`,
+        '--scale': `${ss[i]}`,
+        '--opacity': `${ss[i] ** 2 / 2 + 0.2}`,
+        '--translate-x': `${dxs[i] * 100}cqw`,
+      }))
+    }
+
+    onSnowAnimeRepeat(snow) {
+      snow.left = `${Math.random() * 96 + 2}%`
+    }
+
+    getBg() {
+      if (Array.isArray(this.bg)) {
+        return `linear-gradient(to bottom, ${this.bg.join(', ')})`
+      }
+      return String(this.bg)
+    }
+  }
+</script>
+
+<template>
+  <svg class="waves" viewBox="0 30 150 22">
+    <defs>
+      <path id="wave" d="M192 34c-30 0-58 18-88 18s-58-18-88-18s-58 18-88 18s-58-18-88-18v-44h352z" />
+    </defs>
+    <g class="waves">
+      <use href="#wave" x="48" y="-1" fill="#fff4" />
+      <use href="#wave" x="48" y="-3" fill="#fff3" />
+      <use href="#wave" x="48" y="-5" fill="#fff2" />
+      <use href="#wave" x="48" y="-7" fill="#fff5" />
+    </g>
+  </svg>
+
+  <div class="snows" :data-active="showSnow">
+    <template :each="snows">
+      <div class="snow" :style="item" :onanimationiteration="() => onSnowAnimeRepeat(item)"></div>
+    </template>
+  </div>
+
+  <div class="content">
+    <slot></slot>
+  </div>
+
+  <div class="zigzags">
+    <div class="zigzag"></div>
+    <div class="zigzag"></div>
+  </div>
+</template>
+
+<style>
+  :host {
+    display: block;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .waves {
+    display: block;
+    position: absolute;
+    left: calc(0% - 90px + 15cqw);
+    top: 0;
+    width: calc(100% + 180px - 30cqw);
+    height: auto;
+    opacity: var(--waves-opacity, 1);
+  }
+
+  .waves>use {
+    animation: wave-slide 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
+  }
+
+  .waves>use:nth-child(1) {
+    animation-delay: -6s;
+    animation-duration: 7s;
+  }
+
+  .waves>use:nth-child(2) {
+    animation-delay: -7s;
+    animation-duration: 10s;
+  }
+
+  .waves>use:nth-child(3) {
+    animation-delay: -8s;
+    animation-duration: 13s;
+  }
+
+  .waves>use:nth-child(4) {
+    animation-delay: -9s;
+    animation-duration: 20s;
+  }
+
+  @keyframes wave-slide {
+    0% {
+      translate: -90px 0;
+    }
+
+    100% {
+      translate: 85px 0;
+    }
+  }
+
+  .snows {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 1.5s var(--snow-delay, 0s) ease-out;
+
+    &[data-active] {
+      transition: opacity 1.5s var(--snow-delay, 0s) ease-in;
+      opacity: 1;
+    }
+  }
+
+  .snow {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    animation: snow-fall var(--duration) var(--delay) linear infinite;
+    opacity: 1;
+
+    &::before {
+      display: block;
+      content: '';
+      position: absolute;
+      top: 0px;
+      left: -10px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #fff;
+      scale: var(--scale);
+      opacity: var(--opacity);
+    }
+  }
+
+  @keyframes snow-fall {
+    from {
+      translate: 0px -20px;
+    }
+
+    to {
+      translate: var(--translate-x) 100%;
+    }
+  }
+
+  .content {
+    position: relative;
+  }
+
+  .zigzags {
+    position: relative;
+    height: calc(10cqw + 30px);
+    overflow: hidden;
+  }
+
+  .zigzag {
+    position: absolute;
+    inset: 0;
+    background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"><path fill="white" d="M0 1 0.5 0 1 1Z"/></svg>');
+    background-size: auto 100%;
+    background-repeat: repeat-x;
+    background-position: 50% 0;
+    filter: drop-shadow(0 0 2px #fff8);
+
+    &:nth-child(2) {
+      background-position: calc(50% + 5cqw + 15px) calc(2cqw + 6px);
+      opacity: 0.5;
+    }
+  }
+</style>

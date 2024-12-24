@@ -1,0 +1,165 @@
+<script type="module">
+  import { setupEl } from '@/lib/el/index.js'
+  import './x-text.m.html'
+  import './x-button.m.html'
+
+  export class XDialog extends HTMLElement {
+    static {
+      customElements.define('x-dialog', this)
+    }
+
+    constructor() {
+      super()
+      setupEl(this, import.meta.document)
+    }
+
+    open = (wait) => {
+      wait = wait ?? 100
+      const dialog = this.shadowRoot.querySelector('dialog')
+      dialog.inert = true
+      dialog.showModal()
+      setTimeout(() => dialog.setAttribute('data-active', ''), wait)
+      setTimeout(() => dialog.inert = false, wait + 800)
+    }
+
+    close = () => {
+      const dialog = this.shadowRoot.querySelector('dialog')
+      dialog.removeAttribute('data-active')
+      dialog.close()
+    }
+
+    onDialogClick(e) {
+      if (e.target === e.currentTarget) this.close()
+    }
+  }
+</script>
+
+<template>
+  <dialog class="dialog" :onclick="(e) => onDialogClick(e)" in>
+    <div class="body">
+      <div class="content">
+        <slot></slot>
+      </div>
+    </div>
+    <x-button class="close" :onclick="() => close()">
+      <x-icon></x-icon>
+    </x-button>
+  </dialog>
+</template>
+
+<style>
+  :host {
+    display: contents;
+    font-size: 16px;
+
+    @media (width < 460px) {
+      font-size: 14px;
+    }
+  }
+
+  .dialog {
+    inset: 20cqw 0 auto;
+    margin: 0 auto;
+    box-sizing: border-box;
+    width: fit-content;
+    max-width: calc(100cqw - 32px);
+    height: auto;
+    max-height: calc(100dvh - 20cqw - 16px);
+    padding: unset;
+    color: unset;
+    background: unset;
+    border: unset;
+    outline: unset;
+    overflow: unset;
+    user-select: unset;
+    -webkit-user-select: unset;
+
+    &::backdrop {
+      opacity: 0;
+      background-color: transparent;
+      transition: opacity 0.2s linear;
+      background-image: repeating-linear-gradient(135deg, #fffa 0px, #fffa 30px, #fffd 30px, #fffd 60px);
+    }
+
+    &:not([open]) {
+      transition: display 0.2s allow-discrete, overlay 0.2s allow-discrete;
+    }
+
+    &[data-active] {
+      &::backdrop {
+        opacity: 1;
+        transition: opacity 0.3s linear;
+      }
+    }
+  }
+
+  .close {
+    position: absolute;
+    top: -20cqw;
+    left: calc(50% + 50cqw - 70px);
+    width: 60px;
+    height: 60px;
+    box-sizing: border-box;
+
+    --start-color: var(--color0-start-color);
+    --end-color: var(--color0-end-color);
+    --icon-mask: url(assets/close.svg);
+
+    @media (width < 460px) {
+      left: calc(50% + 50cqw - 60px);
+    }
+  }
+
+  x-icon {
+    width: 50px;
+  }
+
+  .dialog[data-active] .close {
+    opacity: 1;
+    transition: opacity 0.3s linear;
+  }
+
+  .dialog:not([data-active]) .close {
+    opacity: 0;
+    transition: opacity 0.2s linear;
+  }
+
+  .body {
+    position: relative;
+    padding: 16px;
+    background-image: linear-gradient(to bottom, var(--color0-start-color) 20%, var(--color0-end-color) 100%);
+    border-bottom: 1px var(--color0-start-color) solid;
+    border-radius: 2px;
+    box-shadow: 8px 8px 4px #0003;
+  }
+
+  .dialog[data-active] .body {
+    opacity: 1;
+    translate: 0 0px;
+    transition: translate 0.3s ease-out, opacity 0.3s linear;
+  }
+
+  .dialog:not([data-active]) .body {
+    opacity: 0;
+    translate: 0 -24px;
+    transition: translate 0.2s 0.2s ease-out, opacity 0.2s linear;
+  }
+
+  .content {
+    background-color: #fff;
+    padding: 24px 32px 48px;
+    --edge: 16px;
+    clip-path: polygon(var(--edge) 0%,
+        calc(100% - var(--edge)) 0%,
+        100% var(--edge),
+        100% calc(100% - var(--edge)),
+        calc(100% - var(--edge)) 100%,
+        var(--edge) 100%,
+        0% calc(100% - var(--edge)),
+        0% var(--edge));
+
+    @media (width < 460px) {
+      padding: 24px 16px 48px;
+    }
+  }
+</style>

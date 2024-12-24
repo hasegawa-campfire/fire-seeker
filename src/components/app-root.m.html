@@ -1,0 +1,70 @@
+<script type="module">
+  import { setupEl, effect } from '@/lib/el/index.js'
+  import { state, bgm } from '@/r.js'
+  import './title-root.m.html'
+  import './play-root.m.html'
+
+  function startViewTransition(fn) {
+    if (document.startViewTransition) {
+      return document.startViewTransition(fn)
+    } else {
+      return Promise.resolve(fn())
+    }
+  }
+
+  function stopBgm() {
+    for (const audio of Object.values(bgm)) {
+      if (audio.playing) {
+        audio.setVolume(0, 0.5)
+        audio.stop(0.5)
+      }
+    }
+  }
+
+  export class AppRoot extends HTMLElement {
+    static {
+      customElements.define('app-root', this)
+    }
+
+    isPlay = state.isPlay
+
+    constructor() {
+      super()
+      setupEl(this, import.meta.document)
+
+      effect(async () => {
+        const f = state.isPlay
+        if (this.isPlay !== f) {
+          stopBgm()
+          await startViewTransition(() => this.isPlay = f)
+        }
+      })
+    }
+  }
+</script>
+
+<template>
+  <div class="container">
+    <template :if="!isPlay">
+      <title-root></title-root>
+    </template>
+    <template :if="isPlay">
+      <play-root></play-root>
+    </template>
+  </div>
+</template>
+
+<style>
+  :host {
+    display: block;
+  }
+
+  .container {
+    position: relative;
+    max-width: 600px;
+    min-width: 320px;
+    margin: 0 auto;
+    container-type: inline-size;
+    z-index: 0;
+  }
+</style>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<title>FIRE SEEKR</title>
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;900&display=swap" rel="stylesheet" />
+<script type="importmap" data-prod-remove>
+  {
+    "imports": {
+      "@/": "./",
+      "@/lib/bin.js": "./lib/bin.dev.js",
+      "package.json": "./package-dummy.js"
+    }
+  }
+</script>
+<link rel="icon" href="./assets/favicon.ico" sizes="any" />
+<link rel="icon" href="./assets/favicon-192.png" type="image/png" />
+<link rel="apple-touch-icon" href="./assets/favicon-apple-touch-icon.png" />
+<link rel="manifest" href="./manifest.json" />
+<meta name="theme-color" content="#d12929" />
+<meta name="description" content="ハートの在処を見つけよう！マインスイーパー風味のパズルゲームです" />
+<meta name="keywords" content="FIRE SEEKER, マインスイーパー, パズル, ゲーム" />
+<link rel="canonical" href="https://hasegawa-campfire.github.io/fire-max/" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://hasegawa-campfire.github.io/fire-max/" />
+<meta property="og:title" content="FIRE SEEKER" />
+<meta property="og:site_name" content="FIRE SEEKER" />
+<meta property="og:description" content="ハートの在処を見つけよう！マインスイーパー風味のパズルゲームです" />
+<meta property="og:image" content="https://hasegawa-campfire.github.io/fire-seeker/assets/ogp.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@hsgwkt" />
+
+<style>
+  [hidden] {
+    display: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden visible;
+  }
+
+  body {
+    background-color: #fff;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-weight: 900;
+    line-height: 1;
+    color: #444;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  @keyframes fade-old {
+    from {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes fade-new {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  ::view-transition-old(root) {
+    animation: fade-old 0.6s forwards;
+  }
+
+  ::view-transition-new(root) {
+    animation: fade-new 0.4s 0.4s backwards;
+  }
+
+  app-root+h2 {
+    display: none;
+  }
+
+  h2 {
+    text-align: center;
+  }
+
+  :root {
+    --color0-start-color: hsl(0, 67%, 49%);
+    --color0-end-color: hsl(20, 100%, 75%);
+    --color1-start-color: hsl(145, 83%, 28%);
+    --color1-end-color: hsl(130, 83%, 45%);
+    --color2-start-color: hsl(50, 98%, 33%);
+    --color2-end-color: hsl(60, 83%, 45%);
+  }
+</style>
+
+<app-root></app-root>
+<h2>ご利用のブラウザはサポートされていません</h2>
+
+<script type="module" data-prod-remove>
+  await navigator.serviceWorker.register('sw.dev.js', { type: 'module' })
+  if (!navigator.serviceWorker.controller) {
+    await new Promise((resolve) => {
+      navigator.serviceWorker.addEventListener('controllerchange', resolve)
+    })
+  }
+  await import('./main.js')
+</script>
+
+<template data-prod-expand>
+  <script>
+    if (CSS.supports && CSS.supports('selector(&)')) {
+      navigator.serviceWorker.register('sw.js')
+    } else {
+      document.querySelector('app-root').remove()
+    }
+  </script>
+</template>

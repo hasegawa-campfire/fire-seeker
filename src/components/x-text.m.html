@@ -1,0 +1,35 @@
+<script type="module">
+  import { setupEl } from '@/lib/el/index.js'
+
+  export class XText extends HTMLElement {
+    static {
+      customElements.define('x-text', this)
+    }
+
+    constructor() {
+      super()
+      setupEl(this, import.meta.document)
+    }
+  }
+</script>
+
+<template>
+  <span class="face">
+    <slot></slot>
+  </span>
+</template>
+
+<style>
+  :host {
+    display: inline-block;
+    filter: drop-shadow(0px 1px 0px var(--start-color, transparent)) drop-shadow(0px 1px 2px #fff8) drop-shadow(4px 4px 2px #0004);
+    --bg-image: linear-gradient(to bottom, var(--start-color, currentColor) 35%, var(--end-color, currentColor) 95%);
+  }
+
+  .face {
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-image: var(--bg-image);
+    display: inline-block;
+  }
+</style>

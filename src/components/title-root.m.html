@@ -1,0 +1,156 @@
+<script type="module">
+  import { setupEl } from '@/lib/el/index.js'
+  import { version } from 'package.json'
+  import { store, state, pushState, se, bgm } from '@/r.js'
+  import { areas, rules, areaKeys, areaRuleKeys } from '@/rule/index.js'
+  import './x-bg.m.html'
+  import './x-header.m.html'
+  import './x-text.m.html'
+  import './x-button.m.html'
+  import './help-title.m.html'
+  import './title-rules.m.html'
+
+  export class TitleRoot extends HTMLElement {
+    static {
+      customElements.define('title-root', this)
+    }
+
+    version = version
+    areaKey = store.areaKey
+    areaKeys = ('3x3_shuffle_0' in store.moves) ? areaKeys : areaKeys.slice(0, 1)
+
+    constructor() {
+      super()
+      setupEl(this, import.meta.document)
+      bgm.title.play(1)
+    }
+
+    getBgStyle() {
+      return {
+        background: areas[this.areaKey].bg,
+        '--light': areas[this.areaKey].light,
+        '--waves-opacity': areas[this.areaKey].wavesOpacity
+      }
+    }
+
+    setAreaKey(key) {
+      this.areaKey = store.areaKey = key
+    }
+
+    getAreaName(key) {
+      return areas[key].name ?? key
+    }
+
+    selectLevel(ruleKey, level) {
+      pushState({
+        isPlay: true,
+        areaKey: this.areaKey,
+        ruleKey,
+        level,
+      })
+      se.start.play()
+    }
+
+    openHelp = () => {
+      this.shadowRoot.querySelector('.help').open()
+    }
+
+    isAllCleared(areaKey) {
+      return areaRuleKeys[areaKey].every((ruleKey) => {
+        return rules[ruleKey].meta[areaKey].every((_, level) => {
+          return store.moves[`${this.areaKey}_${ruleKey}_${level}`] != null
+        })
+      })
+    }
+  }
+</script>
+
+<template>
+  <help-title class="help"></help-title>
+
+  <x-bg :show-snow="isAllCleared(areaKey)" :style="getBgStyle()">
+    <x-header volume :on-help-click="() => openHelp()"></x-header>
+    <x-text class="version">v${version}</x-text>
+
+    <div class="logo" translate="no">
+      <x-text class="logo-text">Fire Seeker</x-text>
+    </div>
+
+    <div class="area-list">
+      <template :each="areaKeys.length > 1 ? areaKeys : []">
+        <x-button class="area" bg :onclick="() => setAreaKey(item)" :select="item === areaKey">
+          <x-text>${getAreaName(item)}</x-text>
+        </x-button>
+      </template>
+    </div>
+
+    <div class="area-rule-list">
+      <template :each="areaKeys" item-as="ak">
+        <title-rules class="rule-list" :area-key="ak" :data-active="ak === areaKey" :inert="ak !== areaKey"
+          :on-level-select="(rk, lv) => selectLevel(rk, lv)"></title-rules>
+      </template>
+    </div>
+  </x-bg>
+</template>
+
+<style>
+  .version {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 20px;
+    color: #fff;
+    filter: drop-shadow(0 0 2px #0003);
+  }
+
+  .logo {
+    margin: 20px 0 60px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .logo-text {
+    font-size: calc(10cqw + 12px);
+    --start-color: var(--color0-start-color);
+    --end-color: var(--color0-end-color);
+    --bg-image: linear-gradient(to bottom, #fff 0%, #fff 15%, var(--start-color, currentColor) 30%, var(--start-color, currentColor) 35%, var(--end-color, currentColor) 95%);
+  }
+
+  .area-list {
+    margin: 30px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .area {
+    font-size: 25px;
+    --start-color: var(--color0-start-color);
+    --end-color: var(--color0-end-color);
+    --padding: 16px 20px;
+    --cell-stroke: 12px;
+    --select-inset: 4px;
+  }
+
+  .area-rule-list {
+    margin: 30px 0 60px;
+    position: relative;
+    display: grid;
+    grid-auto-columns: 100cqw;
+    justify-items: center;
+    align-items: start;
+  }
+
+  .rule-list {
+    grid-row: 1;
+    grid-column: 1;
+    opacity: 1;
+    /* transition: opacity 0.4s 0.2s; */
+
+    &:not([data-active]) {
+      opacity: 0;
+      /* transition: opacity 0.4s 0s; */
+    }
+  }
+</style>

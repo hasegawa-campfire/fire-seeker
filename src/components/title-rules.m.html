@@ -1,0 +1,159 @@
+<script type="module">
+  import { setupEl } from '@/lib/el/index.js'
+  import { store } from '@/r.js'
+  import { areas, rules, areaRuleKeys, areaUnlockRegs } from '@/rule/index.js'
+  import './x-text.m.html'
+  import './x-heart.m.html'
+  import './x-number.m.html'
+  import './x-button.m.html'
+
+  export class TitleRules extends HTMLElement {
+    static {
+      customElements.define('title-rules', this)
+    }
+
+    areaKey = '3x3'
+    areaRuleKeys = areaRuleKeys
+    onLevelSelect = null
+
+    selectedRuleKey = ''
+    selectedLevel = -1
+
+    constructor() {
+      super()
+      setupEl(this, import.meta.document)
+    }
+
+    getRules() {
+      const recordKeys = Object.keys(store.moves)
+      const results = []
+
+      for (const ruleKey of areaRuleKeys[this.areaKey]) {
+        const regs = areaUnlockRegs[this.areaKey]?.[ruleKey]
+
+        const name = rules[ruleKey].name
+        const locked = !!regs && !regs.every((r) => recordKeys.some((k) => r.test(k)))
+
+        results.push({ key: ruleKey, name, locked })
+
+        if (locked) break
+      }
+
+      return results
+    }
+
+    getLevels(rule) {
+      const levelCount = rules[rule.key].meta[this.areaKey].length
+      const results = []
+
+      for (let levelIndex = 0; levelIndex < levelCount; levelIndex++) {
+        const moves = store.moves[`${this.areaKey}_${rule.key}_${levelIndex}`]
+        const prevMoves = store.moves[`${this.areaKey}_${rule.key}_${levelIndex - 1}`]
+
+        const locked = rule.locked || (levelIndex > 0 && !prevMoves)
+        const cleared = !locked && moves != null
+        const perfect = cleared && moves <= rules[rule.key].meta[this.areaKey][levelIndex].moves
+
+        results.push({ index: levelIndex, locked, cleared, perfect })
+
+        if (locked) break
+      }
+
+      return results
+    }
+
+    selectLevel(ruleKey, level) {
+      this.selectedRuleKeyl = ruleKey
+      this.selectedLevel = level
+      this.onLevelSelect(ruleKey, level)
+    }
+  }
+</script>
+
+<template>
+  <template :each="getRules()" item-as="rule">
+    <div class="rule">
+      <div class="name">
+        <x-text class="name-text">${rule.locked ? '？'.repeat(rule.name.length) : rule.name}</x-text>
+      </div>
+
+      <div class="levels">
+        <template :each="getLevels(rule)" item-as="level">
+          <x-button class="level" :bg="!level.locked"
+            :select="selectedRuleKey == rule.key && selectedLevel === level.index"
+            :onclick="() => selectLevel(rule.key, level.index)" :inert="level.locked">
+            <template :if="level.locked">
+              <x-icon class="level-locked"></x-heart>
+            </template>
+
+            <template :if="!level.locked && level.cleared">
+              <x-heart class="level-heart" :light="level.perfect" :text="level.index + 1"></x-heart>
+            </template>
+
+            <template :if="!level.locked && !level.cleared">
+              <x-number class="level-number" :text="level.index + 1"></x-number>
+            </template>
+          </x-button>
+        </template>
+      </div>
+    </div>
+  </template>
+</template>
+
+<style>
+  :host {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    gap: 20px;
+
+    @media (width < 460px) {
+      grid-template-columns: auto;
+    }
+  }
+
+  .rule {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: span 2;
+    align-items: center;
+    justify-content: start;
+
+    @media (width < 460px) {
+      grid-template-columns: auto;
+      grid-column: auto;
+      gap: 10px;
+    }
+  }
+
+  .name-text {
+    font-size: 25px;
+    color: #fff;
+    filter: drop-shadow(0 0 2px #0004) drop-shadow(4px 4px 2px #0001);
+  }
+
+  .levels {
+    display: flex;
+    justify-content: start;
+    gap: 10px;
+    height: 80px;
+  }
+
+  .level {
+    flex: none;
+    aspect-ratio: 1;
+
+    --start-color: var(--color0-start-color);
+    --end-color: var(--color0-end-color);
+    --select-duration: 0s;
+  }
+
+  .level-heart,
+  .level-number {
+    width: 100%;
+  }
+
+  .level-locked {
+    width: 63%;
+    --icon-mask: url(assets/lock.svg);
+  }
+</style>

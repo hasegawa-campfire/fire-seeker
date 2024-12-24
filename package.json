@@ -1,0 +1,19 @@
+{
+  "name": "fire-seeker",
+  "version": "1.0.0",
+  "source": "src/index.html",
+  "license": "MIT",
+  "scripts": {
+    "serve": "serve -L -p 3000 src",
+    "prebuild": "rm -rf dist",
+    "build": "node build.mjs",
+    "preview": "serve -L -p 8080 dist"
+  },
+  "devDependencies": {
+    "@craftamap/esbuild-plugin-html": "^0.8.0",
+    "esbuild": "^0.24.2",
+    "esbuild-plugin-copy": "^2.1.1",
+    "html-minifier": "^4.0.0",
+    "serve": "^14.2.4"
+  }
+}

@@ -1,0 +1,80 @@
+<script type="module">
+  import { setupEl } from '@/lib/el/index.js'
+  import './x-heart.m.html'
+  import './x-number.m.html'
+
+  export class PlayPiece extends HTMLElement {
+    static {
+      customElements.define('play-piece', this)
+    }
+
+    item = {
+      heart: false,
+      number: false,
+      color: 0,
+      count: 0,
+    }
+    ok = false
+
+    constructor() {
+      super()
+      setupEl(this, import.meta.document)
+    }
+
+    getVectorStyle() {
+      const x = this.item.vector?.x ?? 0
+      const y = this.item.vector?.y ?? 0
+      return { '--translate': `${x * 24}px ${y * 24}px` }
+    }
+
+    onAnimationEnd(e) {
+      if (e.target !== e.currentTarget) return
+      this.item.vector = null
+    }
+  }
+</script>
+
+<template>
+  <div class="content" :style="getVectorStyle()" :data-anime="!!item.vector" :onanimationend="(e) => onAnimationEnd(e)">
+    <template :if="item.heart">
+      <x-heart class="heart" :text="item.number ? item.count : ''" :light="ok"></x-heart>
+    </template>
+
+    <template :if="!item.heart && item.number">
+      <x-number class="number" :text="item.count" :light="ok">${item.count}</x-number>
+    </template>
+  </div>
+</template>
+
+<style>
+  :host {
+    display: contents;
+  }
+
+  .content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    /* will-change: translate, opacity; */
+
+    &[data-anime] {
+      animation: move 0.3s ease-out;
+    }
+  }
+
+  @keyframes move {
+    from {
+      translate: var(--translate);
+      opacity: 0;
+    }
+
+    to {
+      translate: 0px 0px;
+      opacity: 1;
+    }
+  }
+</style>

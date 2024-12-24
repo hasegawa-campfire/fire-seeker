@@ -1,0 +1,138 @@
+<script type="module">
+  import { setupEl } from '@/lib/el/index.js'
+
+  const fontSizes = ['0px', '130px', '80px', '68px']
+
+  export class XNumber extends HTMLElement {
+    static {
+      customElements.define('x-number', this)
+    }
+
+    text = ''
+    light = false
+
+    constructor() {
+      super()
+      setupEl(this, import.meta.document)
+    }
+
+    getFontSize() {
+      const len = String(this.text).length
+      return fontSizes[len]
+    }
+  }
+</script>
+
+<template>
+  <svg viewBox="0 0 220 200" class="image" :style="{ fontSize: getFontSize() }" :data-active="light">
+    <defs>
+      <linearGradient id="bg" gradientTransform="rotate(90)">
+        <stop class="stop-start" offset="30%"></stop>
+        <stop class="stop-end" offset="90%"></stop>
+      </linearGradient>
+
+      <mask id="shape">
+        <text x="50%" y="55%" fill="#fff" dominant-baseline="middle" text-anchor="middle">${text}</text>
+      </mask>
+    </defs>
+
+    <g mask="url(#shape)">
+      <rect class="base-back" x="0" y="0" width="100%" height="100%" fill="url(#bg)"></rect>
+      <rect class="base-front" x="0" y="0" width="100%" height="100%" fill="url(#bg)" mask="url(#shape)"></rect>
+    </g>
+  </svg>
+
+  <svg viewBox="0 0 220 200" class="overlay" :style="{ fontSize: getFontSize() }" :data-active="light">
+    <defs>
+      <filter id="outsert-light">
+        <feGaussianBlur stdDeviation="20" result="blur"></feGaussianBlur>
+        <feComposite operator="out" in="blur" in2="SourceGraphic"></feComposite>
+        <!-- <feMerge>
+          <feMergeNode in="fixed-blur" />
+          <feMergeNode in="fixed-blur" />
+          <feMergeNode in="fixed-blur" />
+        </feMerge> -->
+      </filter>
+
+      <filter id="inset-light">
+        <feGaussianBlur stdDeviation="4" result="blur"></feGaussianBlur>
+        <feComposite operator="out" in="SourceGraphic" in2="blur"></feComposite>
+      </filter>
+
+      <radialGradient id="center-light">
+        <stop offset="0%" stop-color="#fffc"></stop>
+        <stop offset="100%" stop-color="#fff0"></stop>
+      </radialGradient>
+    </defs>
+
+    <g class="light-outsert" filter="url(#outsert-light)">
+      <rect x="0" y="0" width="100%" height="100%" fill="#fff" mask="url(#shape)"></rect>
+    </g>
+
+    <g class="light-inset" filter="url(#inset-light)">
+      <rect x="0" y="0" width="100%" height="100%" fill="#fff" mask="url(#shape)"></rect>
+    </g>
+
+    <circle class="light-center" cx="50%" cy="50%" r="70" fill="url(#center-light)" mask="url(#shape)"></circle>
+  </svg>
+</template>
+
+<style>
+  :host {
+    display: block;
+    position: relative;
+  }
+
+  .image {
+    display: block;
+    width: 100%;
+    filter: drop-shadow(0px 0px 2px #fff8) drop-shadow(4px 4px 2px #0004);
+
+    &[data-active] {
+      filter: drop-shadow(4px 4px 2px #0002);
+    }
+  }
+
+  .overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: block;
+    width: 100%;
+    opacity: 1;
+    transition: opacity 0.2s ease-out;
+    mix-blend-mode: plus-lighter;
+
+    &:not([data-active]) {
+      opacity: 0;
+    }
+  }
+
+  .stop-start {
+    stop-color: var(--start-color);
+  }
+
+  .stop-end {
+    stop-color: var(--end-color);
+  }
+
+  .base-back {
+    filter: brightness(0.8);
+  }
+
+  .base-front {
+    translate: 0px -3px;
+  }
+
+  .light-center {
+    opacity: var(--light, 0.5);
+  }
+
+  .light-outsert {
+    opacity: var(--light, 0.5);
+  }
+
+  .light-inset {
+    opacity: 0.8;
+  }
+</style>

@@ -1,0 +1,106 @@
+<script type="module">
+  import { setupEl } from '@/lib/el/index.js'
+  import './x-dialog.m.html'
+  import './play-piece.m.html'
+
+  export class HelpColorful extends HTMLElement {
+    static {
+      customElements.define('help-colorful', this)
+    }
+
+    constructor() {
+      super()
+      setupEl(this, import.meta.document)
+    }
+
+    open = (wait) => {
+      this.shadowRoot.querySelector('x-dialog').open(wait)
+    }
+  }
+</script>
+
+<template>
+  <x-dialog>
+    <h4>カラフル</h4>
+    数字は、<br />同じ色のハートしか数えません
+    <div class="cells">
+      <div></div>
+      <div></div>
+      <play-piece :item="{ heart: true }"></play-piece>
+      <play-piece class="color1" :item="{ heart: true }"></play-piece>
+      <play-piece :item="{ heart: true, number: true, count: 3 }"></play-piece>
+      <div></div>
+      <div></div>
+      <play-piece :item="{ heart: true }"></play-piece>
+      <div></div>
+      <div class="frame"></div>
+    </div>
+    違う色は全く関係ないので、<br />むしろカンタンかも？
+  </x-dialog>
+</template>
+
+<style>
+  :host {
+    display: contents;
+    font-weight: 400;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  .cells {
+    position: relative;
+    margin: 16px auto;
+    width: 180px;
+    padding: 20px;
+    aspect-ratio: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    align-items: center;
+    justify-items: center;
+    font-weight: 900;
+    background-image:
+      repeating-linear-gradient(to right, #aaa 0px, #aaa 1px, #fff0 1px, #fff0 60px),
+      repeating-linear-gradient(to bottom, #aaa 0px, #aaa 1px, #fff0 1px, #fff0 60px);
+    background-position: 20px 20px;
+
+    --start-color: var(--color0-start-color);
+    --end-color: var(--color0-end-color);
+  }
+
+  .color1 {
+    --start-color: var(--color1-start-color);
+    --end-color: var(--color1-end-color);
+  }
+
+  .frame {
+    position: absolute;
+    inset: 10px;
+    border-radius: 10px;
+    border: var(--color0-start-color) 3px solid;
+    box-shadow: 0 0 0 2px #fff8, 0 0 0 2px #fff8 inset;
+    filter: drop-shadow(4px 4px 2px #0002);
+  }
+
+  h4 {
+    font-weight: 900;
+    margin: 2em 0 1em;
+    font-size: 140%;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    &:first-of-type {
+      margin-top: 0;
+    }
+
+    &::before,
+    &::after {
+      content: '';
+      flex: auto;
+      height: 2px;
+      border-top: #ccc 1px solid;
+      border-bottom: #ccc 1px solid;
+    }
+  }
+</style>
