@@ -1,7 +1,7 @@
 <script type="module">
   import { setupEl } from '@/lib/el/index.js'
   import { version } from 'package.json'
-  import { store, state, pushState, se, bgm } from '@/r.js'
+  import { store, state, pushState, se, bgm, viewTransition } from '@/r.js'
   import { areas, rules, areaKeys, areaRuleKeys } from '@/rule/index.js'
   import './x-bg.m.html'
   import './x-header.m.html'
@@ -22,7 +22,9 @@
     constructor() {
       super()
       setupEl(this, import.meta.document)
-      bgm.title.play(1)
+      viewTransition.finished.then(() => {
+        bgm.title.play(0.2)
+      })
     }
 
     getBgStyle() {
@@ -43,16 +45,16 @@
 
     selectLevel(ruleKey, level) {
       pushState({
-        isPlay: true,
         areaKey: this.areaKey,
         ruleKey,
         level,
+        isPlay: true,
       })
       se.start.play()
     }
 
-    openHelp = () => {
-      this.shadowRoot.querySelector('.help').open()
+    openHelp = (wait) => {
+      this.shadowRoot.querySelector('.help').open(wait)
     }
 
     isAllCleared(areaKey) {

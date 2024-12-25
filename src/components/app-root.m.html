@@ -1,6 +1,6 @@
 <script type="module">
   import { setupEl, effect } from '@/lib/el/index.js'
-  import { state, bgm } from '@/r.js'
+  import { state, bgm, viewTransition } from '@/r.js'
   import './title-root.m.html'
   import './play-root.m.html'
 
@@ -8,7 +8,7 @@
     if (document.startViewTransition) {
       return document.startViewTransition(fn)
     } else {
-      return Promise.resolve(fn())
+      return { finished: Promise.resolve(fn()) }
     }
   }
 
@@ -32,11 +32,11 @@
       super()
       setupEl(this, import.meta.document)
 
-      effect(async () => {
+      effect(() => {
         const f = state.isPlay
         if (this.isPlay !== f) {
           stopBgm()
-          await startViewTransition(() => (this.isPlay = f))
+          viewTransition.finished = startViewTransition(() => (this.isPlay = f)).finished
         }
       })
     }

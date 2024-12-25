@@ -1,6 +1,6 @@
 <script type="module">
   import { setupEl } from '@/lib/el/index.js'
-  import { store, state, se, bgm } from '@/r.js'
+  import { store, state, se, bgm, viewTransition } from '@/r.js'
   import './x-bg.m.html'
   import './x-header.m.html'
   import './x-button.m.html'
@@ -68,12 +68,13 @@
       })
       console.debug(answerLines.join('\n'))
 
-      if (!store.help[ruleKey]) {
-        store.help[ruleKey] = true
-        requestAnimationFrame(() => this.openHelp(1000))
-      }
-
-      bgm.play.play(1)
+      viewTransition.finished.then(() => {
+        bgm.play.play(0.2)
+        if (!store.help[ruleKey]) {
+          store.help[ruleKey] = true
+          requestAnimationFrame(() => this.openHelp())
+        }
+      })
     }
 
     goBack() {

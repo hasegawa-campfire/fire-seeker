@@ -70,3 +70,7 @@ function safeJsonParse(text) {
     return null
   }
 }
+
+export const viewTransition = {
+  finished: Promise.resolve(),
+}
