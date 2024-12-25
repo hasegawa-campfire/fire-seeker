@@ -51,8 +51,10 @@
   :host {
     display: contents;
     font-size: 16px;
+  }
 
-    @media (width < 460px) {
+  @media (width < 460px) {
+    :host {
       font-size: 14px;
     }
   }
@@ -147,7 +149,7 @@
 
   .content {
     background-color: #fff;
-    padding: 24px 32px 48px;
+    padding: 24px 32px 32px;
     --edge: 16px;
     clip-path: polygon(var(--edge) 0%,
         calc(100% - var(--edge)) 0%,
@@ -159,7 +161,7 @@
         0% var(--edge));
 
     @media (width < 460px) {
-      padding: 24px 16px 48px;
+      padding: 24px 16px 32px;
     }
   }
 </style>

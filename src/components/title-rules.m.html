@@ -79,7 +79,7 @@
 
       <div class="levels">
         <template :each="getLevels(rule)" item-as="level">
-          <x-button class="level" :bg="!level.locked"
+          <x-button class="level" bg
             :select="selectedRuleKey == rule.key && selectedLevel === level.index"
             :onclick="() => selectLevel(rule.key, level.index)" :inert="level.locked">
             <template :if="level.locked">
@@ -105,9 +105,12 @@
     display: grid;
     grid-template-columns: repeat(2, auto);
     gap: 20px;
+  }
 
-    @media (width < 460px) {
+  @media (width < 460px) {
+    :host {
       grid-template-columns: auto;
+      gap: 24px;
     }
   }
 

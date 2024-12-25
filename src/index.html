@@ -19,7 +19,6 @@
 <link rel="icon" href="./assets/favicon-192.png" type="image/png" />
 <link rel="apple-touch-icon" href="./assets/favicon-apple-touch-icon.png" />
 <link rel="manifest" href="./manifest.json" />
-<meta name="theme-color" content="#d12929" />
 <meta name="description" content="ハートの在処を見つけよう！マインスイーパー風味のパズルゲームです" />
 <meta name="keywords" content="FIRE SEEKER, マインスイーパー, パズル, ゲーム" />
 <link rel="canonical" href="https://hasegawa-campfire.github.io/fire-max/" />
@@ -60,6 +59,7 @@
     user-select: none;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+    cursor: default;
   }
 
   @keyframes fade-old {
@@ -80,6 +80,10 @@
     to {
       opacity: 1;
     }
+  }
+
+  ::view-transition {
+    background-color: #fff;
   }
 
   ::view-transition-old(root) {

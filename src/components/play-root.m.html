@@ -290,17 +290,19 @@
   }
 
   .board {
+    position: relative;
     padding: 5cqw 15cqw 10cqw;
     display: grid;
     grid-template-columns: repeat(var(--area-w), 1fr);
     gap: 10px;
 
     @media (width < 460px) {
-      padding: 32px 16px;
+      padding: 16px 16px 24px;
     }
 
     &.rests {
       padding-top: 0;
+      top: -8px;
     }
   }
 

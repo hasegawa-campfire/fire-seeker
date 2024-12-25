@@ -36,11 +36,11 @@ addEventListener('popstate', () => {
 })
 
 export const bgm = {
-  title: new Audio(bin('title.ogg'), {
+  title: new Audio(bin('title.mp3'), {
     volume: 0.2,
     loop: true,
   }),
-  play: new Audio(bin('play.ogg'), {
+  play: new Audio(bin('play.mp3'), {
     volume: 0.2,
     loop: {
       start: 10.578,

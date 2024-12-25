@@ -20,6 +20,5 @@
   ],
   "start_url": "./",
   "display": "fullscreen",
-  "background_color": "#ffffff",
-  "theme_color": "#d12929"
+  "background_color": "#ffffff"
 }

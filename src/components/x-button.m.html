@@ -33,6 +33,10 @@
     <div class="bg-stroke bottom"></div>
   </template>
 
+  <template :if="!bg">
+    <div class="bg-frame"></div>
+  </template>
+
   <div class="checked left" :data-active="checked"></div>
   <div class="checked right" :data-active="checked"></div>
 
