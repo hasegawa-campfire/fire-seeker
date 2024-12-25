@@ -22,15 +22,18 @@
     display: block;
     position: relative;
     aspect-ratio: 1;
-    filter: drop-shadow(0px 1px 0px var(--start-color, transparent)) drop-shadow(0px 1px 2px #fff8) drop-shadow(4px 4px 2px #0004);
+    filter: drop-shadow(0px 1px 0px var(--start-color, transparent)) drop-shadow(0px 1px 2px #fff8)
+      drop-shadow(4px 4px 2px #0004);
   }
 
   .face {
     position: absolute;
     inset: 0;
-    background-image: linear-gradient(to bottom,
-        var(--start-color, currentColor) 30%,
-        var(--end-color, currentColor) 90%);
+    background-image: linear-gradient(
+      to bottom,
+      var(--start-color, currentColor) 30%,
+      var(--end-color, currentColor) 90%
+    );
     mask-image: var(--icon-mask);
     mask-size: var(--icon-size, contain);
     mask-repeat: no-repeat;

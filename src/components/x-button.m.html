@@ -71,7 +71,9 @@
     inset: 0;
     background-color: #fff0;
     background-image: linear-gradient(to bottom, #fff2, #fff4);
-    box-shadow: 0 0 0px 0px #fff0, 10px 10px 10px #0001;
+    box-shadow:
+      0 0 0px 0px #fff0,
+      10px 10px 10px #0001;
     border: #fff6 1px solid;
     border-radius: 2px;
     box-sizing: border-box;
@@ -85,13 +87,17 @@
     from {
       background-color: #fff2;
       border: #ffff 1px solid;
-      box-shadow: 0 0 5px 2px #ffff, 10px 10px 10px #0001;
+      box-shadow:
+        0 0 5px 2px #ffff,
+        10px 10px 10px #0001;
     }
 
     to {
       background-color: #fff0;
       border: #fff6 1px solid;
-      box-shadow: 0 0 0px 0px #fff0, 10px 10px 10px #0001;
+      box-shadow:
+        0 0 0px 0px #fff0,
+        10px 10px 10px #0001;
     }
   }
 
@@ -172,16 +178,18 @@
   .select-stroke {
     position: absolute;
     inset: 0;
-    clip-path: polygon(0% 0%,
-        100% 0%,
-        100% 100%,
-        0% 100%,
-        0% 0%,
-        var(--select-stroke) var(--select-stroke),
-        var(--select-stroke) calc(100% - var(--select-stroke)),
-        calc(100% - var(--select-stroke)) calc(100% - var(--select-stroke)),
-        calc(100% - var(--select-stroke)) var(--select-stroke),
-        var(--select-stroke) var(--select-stroke));
+    clip-path: polygon(
+      0% 0%,
+      100% 0%,
+      100% 100%,
+      0% 100%,
+      0% 0%,
+      var(--select-stroke) var(--select-stroke),
+      var(--select-stroke) calc(100% - var(--select-stroke)),
+      calc(100% - var(--select-stroke)) calc(100% - var(--select-stroke)),
+      calc(100% - var(--select-stroke)) var(--select-stroke),
+      var(--select-stroke) var(--select-stroke)
+    );
     background-image: linear-gradient(to bottom, var(--start-color) 20%, var(--end-color) 100%);
     opacity: 0;
     transition: opacity var(--select-duration) linear;

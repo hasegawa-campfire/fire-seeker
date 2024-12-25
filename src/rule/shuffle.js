@@ -44,7 +44,7 @@ export function gen({ area, areaKey, level }) {
 
 function swap(cells, steps) {
   cells = [...cells]
-  const indexes = shuffle(cells.flatMap((cell, i) => cell.selectable ? i : []))
+  const indexes = shuffle(cells.flatMap((cell, i) => (cell.selectable ? i : [])))
 
   for (let i = 0; i < steps; i++) {
     if (indexes.length < 2) return
@@ -71,10 +71,12 @@ function swap(cells, steps) {
 }
 
 function eq(cell1, cell2) {
-  return cell1.heart === cell2.heart &&
+  return (
+    cell1.heart === cell2.heart &&
     cell1.number === cell2.number &&
     cell1.count === cell2.count &&
     cell1.color === cell2.color
+  )
 }
 
 function check(area, cells) {
@@ -83,7 +85,7 @@ function check(area, cells) {
     const cell = cells[i]
     if (!cell.number) continue
     if (results[cell.color] == null) results[cell.color] = true
-    results[cell.color] &&= (cell.count === counting(area, cells, i))
+    results[cell.color] &&= cell.count === counting(area, cells, i)
   }
   return Object.values(results).includes(true)
 }

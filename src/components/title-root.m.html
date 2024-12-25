@@ -17,7 +17,7 @@
 
     version = version
     areaKey = store.areaKey
-    areaKeys = ('3x3_shuffle_0' in store.moves) ? areaKeys : areaKeys.slice(0, 1)
+    areaKeys = '3x3_shuffle_0' in store.moves ? areaKeys : areaKeys.slice(0, 1)
 
     constructor() {
       super()
@@ -29,7 +29,7 @@
       return {
         background: areas[this.areaKey].bg,
         '--light': areas[this.areaKey].light,
-        '--waves-opacity': areas[this.areaKey].wavesOpacity
+        '--waves-opacity': areas[this.areaKey].wavesOpacity,
       }
     }
 
@@ -86,8 +86,13 @@
 
     <div class="area-rule-list">
       <template :each="areaKeys" item-as="ak">
-        <title-rules class="rule-list" :area-key="ak" :data-active="ak === areaKey" :inert="ak !== areaKey"
-          :on-level-select="(rk, lv) => selectLevel(rk, lv)"></title-rules>
+        <title-rules
+          class="rule-list"
+          :area-key="ak"
+          :data-active="ak === areaKey"
+          :inert="ak !== areaKey"
+          :on-level-select="(rk, lv) => selectLevel(rk, lv)"
+        ></title-rules>
       </template>
     </div>
   </x-bg>
@@ -113,7 +118,14 @@
     font-size: calc(10cqw + 12px);
     --start-color: var(--color0-start-color);
     --end-color: var(--color0-end-color);
-    --bg-image: linear-gradient(to bottom, #fff 0%, #fff 15%, var(--start-color, currentColor) 30%, var(--start-color, currentColor) 35%, var(--end-color, currentColor) 95%);
+    --bg-image: linear-gradient(
+      to bottom,
+      #fff 0%,
+      #fff 15%,
+      var(--start-color, currentColor) 30%,
+      var(--start-color, currentColor) 35%,
+      var(--end-color, currentColor) 95%
+    );
   }
 
   .area-list {

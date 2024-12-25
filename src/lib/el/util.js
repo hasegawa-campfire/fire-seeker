@@ -1,6 +1,6 @@
 export function* walkNode(root, whatToShow, filter) {
   const it = document.createNodeIterator(root, whatToShow, filter)
-  for (let node; (node = it.nextNode());) yield node
+  for (let node; (node = it.nextNode()); ) yield node
 }
 
 export const rawKey = Symbol()
@@ -16,8 +16,8 @@ export function wrapObject(obj) {
     [rawKey]: {
       get() {
         return Object.getPrototypeOf(this)
-      }
-    }
+      },
+    },
   })
 }
 

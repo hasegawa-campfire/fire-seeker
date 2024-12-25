@@ -90,7 +90,8 @@
           cell.number === sel.number &&
           cell.heart === sel.heart &&
           cell.count === sel.count
-        ) return false
+        )
+          return false
         return true
       }
       if (this.selectedRest !== null) {
@@ -206,7 +207,7 @@
       requestAnimationFrame(() => {
         this.isEnding = true
         this.isPerfect = this.currentMoves <= this.targetMoves
-        setTimeout(() => this.isEnded = true, 2300)
+        setTimeout(() => (this.isEnded = true), 2300)
         se.clear1.play()
         if (this.isPerfect) se.clear2.play(1.5)
         bgm.play.setVolume(0, 2.5)
@@ -251,9 +252,17 @@
 
     <div class="board cells" :inert="isEnding">
       <template :each="cells">
-        <x-button :bg="!!item.selectable" :select="selectedCell === index" :checked="!!item.checked"
-          :highlight="isHighlight(index)" no-se :onpointerdown="(e) => {!e.button && onCellClick(index)}"
-          :inert="!item.selectable" :data-color="item.color" :data-index="index">
+        <x-button
+          :bg="!!item.selectable"
+          :select="selectedCell === index"
+          :checked="!!item.checked"
+          :highlight="isHighlight(index)"
+          no-se
+          :onpointerdown="(e) => {!e.button && onCellClick(index)}"
+          :inert="!item.selectable"
+          :data-color="item.color"
+          :data-index="index"
+        >
           <template :if="item.heart || item.number">
             <play-piece :item="item" :ok="!item.number || item.count === counting(area, cells, index)"></play-piece>
           </template>
@@ -264,8 +273,14 @@
 
   <div class="board rests" :inert="isEnding">
     <template :each="rests">
-      <x-button no-se :onpointerdown="(e) => {!e.button && onRestClick(index)}" :select="selectedRest === index"
-        :inert="!(item.heart || item.number)" :data-color="item.color" :data-index="index">
+      <x-button
+        no-se
+        :onpointerdown="(e) => {!e.button && onRestClick(index)}"
+        :select="selectedRest === index"
+        :inert="!(item.heart || item.number)"
+        :data-color="item.color"
+        :data-index="index"
+      >
         <template :if="item.heart || item.number">
           <play-piece :item="item"></play-piece>
         </template>
@@ -274,8 +289,12 @@
   </div>
 
   <template :if="isEnding">
-    <div class="overlay" :onclick="() => isEnded && onOverlayClick()" :data-clickable="isEnded"
-      :style="{ '--light': bgStyle.light }"></div>
+    <div
+      class="overlay"
+      :onclick="() => isEnded && onOverlayClick()"
+      :data-clickable="isEnded"
+      :style="{ '--light': bgStyle.light }"
+    ></div>
   </template>
 </template>
 

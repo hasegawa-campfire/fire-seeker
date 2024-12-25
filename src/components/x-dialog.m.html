@@ -19,7 +19,7 @@
       dialog.inert = true
       dialog.showModal()
       setTimeout(() => dialog.setAttribute('data-active', ''), wait)
-      setTimeout(() => dialog.inert = false, wait + 800)
+      setTimeout(() => (dialog.inert = false), wait + 800)
     }
 
     close = () => {
@@ -84,7 +84,9 @@
     }
 
     &:not([open]) {
-      transition: display 0.2s allow-discrete, overlay 0.2s allow-discrete;
+      transition:
+        display 0.2s allow-discrete,
+        overlay 0.2s allow-discrete;
     }
 
     &[data-active] {
@@ -138,27 +140,33 @@
   .dialog[data-active] .body {
     opacity: 1;
     translate: 0 0px;
-    transition: translate 0.3s ease-out, opacity 0.3s linear;
+    transition:
+      translate 0.3s ease-out,
+      opacity 0.3s linear;
   }
 
   .dialog:not([data-active]) .body {
     opacity: 0;
     translate: 0 -24px;
-    transition: translate 0.2s 0.2s ease-out, opacity 0.2s linear;
+    transition:
+      translate 0.2s 0.2s ease-out,
+      opacity 0.2s linear;
   }
 
   .content {
     background-color: #fff;
     padding: 24px 32px 32px;
     --edge: 16px;
-    clip-path: polygon(var(--edge) 0%,
-        calc(100% - var(--edge)) 0%,
-        100% var(--edge),
-        100% calc(100% - var(--edge)),
-        calc(100% - var(--edge)) 100%,
-        var(--edge) 100%,
-        0% calc(100% - var(--edge)),
-        0% var(--edge));
+    clip-path: polygon(
+      var(--edge) 0%,
+      calc(100% - var(--edge)) 0%,
+      100% var(--edge),
+      100% calc(100% - var(--edge)),
+      calc(100% - var(--edge)) 100%,
+      var(--edge) 100%,
+      0% calc(100% - var(--edge)),
+      0% var(--edge)
+    );
 
     @media (width < 460px) {
       padding: 24px 16px 32px;

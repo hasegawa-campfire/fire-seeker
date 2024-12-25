@@ -16,8 +16,8 @@ export function getAttr(el, attrName, valueType = 'string') {
   return valueType === 'number' || valueType === 'bigint'
     ? Number(value)
     : valueType === 'boolean'
-    ? value !== 'false'
-    : value
+      ? value !== 'false'
+      : value
 }
 
 export function setAttr(el, attrName, value) {

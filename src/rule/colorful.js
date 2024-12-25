@@ -5,7 +5,11 @@ export const name = 'カラフル'
 export const meta = {
   '3x3': [{ moves: 6, none: 2 }, { moves: 7, none: 1 }, { moves: 9 }],
   '4x4': [{ moves: 8, num: 6, none: 1 }, { moves: 10, htNum: 4 }, { moves: 16 }],
-  '5x5': [{ moves: 12, num: 9, none: 3, cols: 3 }, { moves: 15, htNum: 6, none: 2, cols: 3 }, { moves: 25, cols: 3 }],
+  '5x5': [
+    { moves: 12, num: 9, none: 3, cols: 3 },
+    { moves: 15, htNum: 6, none: 2, cols: 3 },
+    { moves: 25, cols: 3 },
+  ],
 }
 
 export function gen({ area, areaKey, level }) {

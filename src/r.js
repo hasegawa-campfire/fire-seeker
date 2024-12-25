@@ -1,4 +1,4 @@
-import { reactive, raw, effect } from "@/lib/el/index.js"
+import { reactive, raw, effect } from '@/lib/el/index.js'
 import { ActiveState } from '@/lib/active-state.js'
 import { Audio, setAudioVolume } from '@/lib/audio.js'
 import bin from '@/lib/bin.js'
@@ -12,7 +12,7 @@ export const store = reactive({
   areaKey: '3x3',
   moves: {},
   help: {},
-  ...safeJsonParse(localStorage.getItem(localStorageKey))
+  ...safeJsonParse(localStorage.getItem(localStorageKey)),
 })
 
 effect(() => {
@@ -57,10 +57,10 @@ export const se = {
   start: new Audio(bin('start.mp3'), { volume: 0.5 }),
 }
 
-export const maxVolume = 0.8
+export const maxVolume = 0.7
 
 activeState.on((state) => {
-  setAudioVolume((state && !store.isMute) ? maxVolume : 0)
+  setAudioVolume(state && !store.isMute ? maxVolume : 0)
 })
 
 function safeJsonParse(text) {

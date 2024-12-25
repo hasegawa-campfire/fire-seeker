@@ -45,7 +45,7 @@ export function reactive(target) {
         trigger(depsMap, key)
         trigger(depsMap, ownKeysKey)
       }
-    }
+    },
   })
 
   targetMap.set(target, proxy)

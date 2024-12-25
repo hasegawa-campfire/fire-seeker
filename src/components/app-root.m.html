@@ -36,7 +36,7 @@
         const f = state.isPlay
         if (this.isPlay !== f) {
           stopBgm()
-          await startViewTransition(() => this.isPlay = f)
+          await startViewTransition(() => (this.isPlay = f))
         }
       })
     }
